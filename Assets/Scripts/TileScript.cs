@@ -8,18 +8,33 @@ public class TileScript : MonoBehaviour
     public Tile Tile
     {
         get { return Tile; }
-        set { UpdateMaterial(value); }
+        set
+        {
+            Tile = value;
+            spriteRenderer.material = value?.material;
+        }
     }
     public Vector2Int Position
     {
         get { return Position; }
-        set { UpdatePosition(value); }
+        set
+        {
+            Position = value;
+            transform.localPosition = (Vector2)value;
+        }
     }
+
+    public static GameObject prefab { get; private set; }
 
     SpriteRenderer spriteRenderer;
 
     void Awake()
     {
+        if (prefab == null)
+        {
+            prefab = Resources.Load<GameObject>("Prefabs/Tile");
+        }
+
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         if (Tile != null)
@@ -27,7 +42,7 @@ public class TileScript : MonoBehaviour
             spriteRenderer.material = Tile.material;
         }
 
-        transform.position = (Vector2)Position;
+        transform.localPosition = (Vector2)Position;
     }
 
     void Start()
@@ -35,15 +50,10 @@ public class TileScript : MonoBehaviour
 
     }
 
-    void UpdateMaterial(Tile tile)
+    public GameObject CreateTile()
     {
-        Tile = tile;
-        spriteRenderer.material = tile.material;
-    }
+        var tile = Instantiate(prefab);
 
-    void UpdatePosition(Vector2Int pos)
-    {
-        Position = pos;
-        transform.position = (Vector2)pos;
+        return null;
     }
 }
