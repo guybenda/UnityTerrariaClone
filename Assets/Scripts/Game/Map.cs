@@ -18,5 +18,18 @@ namespace Assets.Scripts.Game
             Height = height;
             Width = width;
         }
+
+        public static Map GetDefaultMap()
+        {
+            Map map = new(30,20);
+
+            for (int i = 0; i < map.Tiles.GetLength(0); i++)
+            {
+                map.Tiles[i, 0] = TileId.Stone;
+                map.Tiles[i, 1] = TileId.Dirt;
+            }
+
+            return map;
+        }
     }
 }
