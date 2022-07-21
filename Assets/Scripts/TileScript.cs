@@ -11,8 +11,8 @@ public class TileScript : MonoBehaviour
         set
         {
             Tile = value;
-            spriteRenderer.sprite = value.sprite.Sprite().sprite;
-            spriteRenderer.color = value.sprite.Sprite().color;
+            spriteRenderer.sprite = value?.sprite.Sprite().sprite;
+            spriteRenderer.color = value?.sprite.Sprite().color ?? Color.black;
         }
     }
     public Vector2Int Position
@@ -25,7 +25,7 @@ public class TileScript : MonoBehaviour
         }
     }
 
-    private static GameObject prefab { get; set; }
+    private static GameObject prefab;
 
     SpriteRenderer spriteRenderer;
 
@@ -39,7 +39,7 @@ public class TileScript : MonoBehaviour
 
     }
 
-    public static GameObject CreateTile()
+    public static GameObject CreateTile(Tile tile = null, Vector2Int position = new Vector2Int())
     {
         if (prefab == null)
         {
@@ -47,8 +47,12 @@ public class TileScript : MonoBehaviour
             Debug.Log(prefab);
         }
 
-        var tile = Instantiate(prefab);
-        // TODO
-        return tile;
+        var tileObject = Instantiate(prefab);
+
+        var tileScript = tileObject.GetComponent<TileScript>();
+        tileScript.Position = position;
+        tileScript.Tile = tile;
+
+        return tileObject;
     }
 }

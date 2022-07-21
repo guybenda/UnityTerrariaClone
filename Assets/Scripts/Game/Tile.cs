@@ -20,6 +20,7 @@ namespace Assets.Scripts.Game
         public SpriteId sprite;
 
         public static readonly Tile[] Tiles = InitializeTiles();
+        public static readonly Tile Default = Tiles[0];
 
         private static Tile[] InitializeTiles()
         {

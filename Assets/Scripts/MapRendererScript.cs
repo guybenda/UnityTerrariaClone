@@ -11,7 +11,10 @@ public class MapRendererScript : MonoBehaviour
 
     void Start()
     {
-        
+        for (int i = 0; i < tiles.Length; i++)
+        {
+
+        }
     }
 
     void Update()
