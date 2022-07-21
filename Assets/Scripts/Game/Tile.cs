@@ -17,7 +17,7 @@ namespace Assets.Scripts.Game
     public class Tile
     {
         public TileId id;
-        public Material material;
+        public SpriteId sprite;
 
         public static readonly Tile[] Tiles = InitializeTiles();
 
@@ -28,17 +28,17 @@ namespace Assets.Scripts.Game
                 new Tile
                 {
                     id = TileId.Air,
-                    material = null
+                    sprite = SpriteId.Air
                 },
                 new Tile
                 {
                     id = TileId.Dirt,
-                    material = null
+                    sprite = SpriteId.Dirt
                 },
                 new Tile
                 {
                     id = TileId.Stone,
-                    material = null
+                    sprite = SpriteId.Stone
                 }
             };
         }
@@ -50,8 +50,6 @@ namespace Assets.Scripts.Game
             //return Tiles.Where(x => x.id == id).FirstOrDefault();
         }
     }
-
-
 
     public static class TileIdExtensions
     {

@@ -9,6 +9,7 @@ namespace Assets.Scripts.Game
 {
     public enum SpriteId
     {
+        Air,
         Dirt,
         Stone,
     }
@@ -16,12 +17,12 @@ namespace Assets.Scripts.Game
     public class GameSprite
     {
         public readonly SpriteId id;
-        public readonly Texture2D texture;
+        public readonly Sprite sprite;
         public readonly Color color;
 
         public static readonly GameSprite[] Sprites;
 
-        private static readonly Texture2D[] InternalTextures;
+        private static readonly Sprite[] InternalSprites;
 
         static GameSprite()
         {
@@ -29,36 +30,40 @@ namespace Assets.Scripts.Game
             InitializeSprites();
         }
 
-        private GameSprite(SpriteId id, Texture2D texture, Color color)
+        private GameSprite(SpriteId id, Sprite sprite, Color color)
         {
             this.id = id;
-            this.texture = texture;
+            this.sprite = sprite;
             this.color = color;
         }
 
         private static GameSprite[] InitializeSprites()
         {
             return new GameSprite[] {
-                new GameSprite(SpriteId.Dirt, TextureByName("Rough"), new Color(0.3301887f, 0.1829219f,0f)),
-                new GameSprite(SpriteId.Stone, TextureByName("Rough"), new Color(0.3490566f, 0.3490566f,0.3490566f))
+                new GameSprite(SpriteId.Air, null, new Color(0f,0f,0f)),
+                new GameSprite(SpriteId.Dirt, SpriteByName("Rough"), new Color(0.3301887f, 0.1829219f,0f)),
+                new GameSprite(SpriteId.Stone, SpriteByName("Rough"), new Color(0.3490566f, 0.3490566f,0.3490566f))
             };
         }
 
-        private static Texture2D[] LoadSprites()
+        private static Sprite[] LoadSprites()
         {
-            return Resources.LoadAll<Texture2D>("TileSprites");
+            return Resources.LoadAll<Sprite>("TileSprites");
 
         }
 
-        private static Texture2D TextureByName(string name)
+        private static Sprite SpriteByName(string name)
         {
-            return InternalTextures.Where(x => x.name == name).FirstOrDefault();
+            return InternalSprites.Where(x => x.name == name).FirstOrDefault();
         }
+    }
 
 
-        public static GameSprite ById(SpriteId id)
+    public static class SpriteIdExtensions
+    {
+        public static GameSprite Sprite(this SpriteId id)
         {
-            return Sprites.Where(x => x.id == id).FirstOrDefault();
+            return GameSprite.Sprites[(int)id];
         }
     }
 }
