@@ -40,7 +40,7 @@ namespace Assets.Scripts.Game
         private static GameSprite[] InitializeSprites()
         {
             return new GameSprite[] {
-                new GameSprite(SpriteId.Air, null, new Color(0f,0f,0f)),
+                new GameSprite(SpriteId.Air, SpriteByName("Blank"), new Color(0.3280972f,0.8102563f,0.9528302f)),
                 new GameSprite(SpriteId.Dirt, SpriteByName("Rough"), new Color(0.3301887f, 0.1829219f,0f)),
                 new GameSprite(SpriteId.Stone, SpriteByName("Rough"), new Color(0.3490566f, 0.3490566f,0.3490566f))
             };

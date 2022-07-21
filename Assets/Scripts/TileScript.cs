@@ -28,6 +28,17 @@ public class TileScript : MonoBehaviour
         }
     }
 
+    private float _scale;
+    public float Scale
+    {
+        get { return _scale; }
+        set
+        {
+            _scale = value;
+            transform.localScale = new Vector3(value, value, value);
+        }
+    }
+
     private static GameObject prefab;
 
     SpriteRenderer spriteRenderer;
