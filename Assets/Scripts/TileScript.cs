@@ -5,22 +5,25 @@ using UnityEngine;
 
 public class TileScript : MonoBehaviour
 {
+    private Tile _tile;
     public Tile Tile
     {
-        get { return Tile; }
+        get { return _tile; }
         set
         {
-            Tile = value;
+            _tile = value;
             spriteRenderer.sprite = value?.sprite.Sprite().sprite;
             spriteRenderer.color = value?.sprite.Sprite().color ?? Color.black;
         }
     }
+
+    private Vector2Int _position;
     public Vector2Int Position
     {
-        get { return Position; }
+        get { return _position; }
         set
         {
-            Position = value;
+            _position = value;
             transform.localPosition = (Vector2)value;
         }
     }

@@ -20,14 +20,14 @@ namespace Assets.Scripts.Game
         public readonly Sprite sprite;
         public readonly Color color;
 
-        public static readonly GameSprite[] Sprites;
+        public static GameSprite[] Sprites { get; private set; }
 
-        private static readonly Sprite[] InternalSprites;
+        private static Sprite[] internalSprites;
 
         static GameSprite()
         {
-            LoadSprites();
-            InitializeSprites();
+            internalSprites = LoadSprites();
+            Sprites = InitializeSprites();
         }
 
         private GameSprite(SpriteId id, Sprite sprite, Color color)
@@ -54,7 +54,7 @@ namespace Assets.Scripts.Game
 
         private static Sprite SpriteByName(string name)
         {
-            return InternalSprites.Where(x => x.name == name).FirstOrDefault();
+            return internalSprites.Where(x => x.name == name).FirstOrDefault();
         }
     }
 
