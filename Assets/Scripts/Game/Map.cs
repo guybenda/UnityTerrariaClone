@@ -39,7 +39,7 @@ namespace Assets.Scripts.Game
 
         public static Map GetDefaultMap()
         {
-            Map map = new(600, 400);
+            Map map = new(60, 40);
 
             for (int i = 0; i < map.Tiles.GetLength(0); i++)
             {
