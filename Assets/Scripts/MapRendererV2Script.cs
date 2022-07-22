@@ -16,8 +16,8 @@ public class MapRendererV2Script : MonoBehaviour
 
         tilemap = GetComponentInChildren<Tilemap>();
 
-        var tiles = tilemap.GetTilesBlock(new BoundsInt(-99, -99, -99, 99, 99, 99));
-        Debug.Log(tilemap.GetTilesBlock(new BoundsInt(-99, -99, -99, 99, 99, 99)).Length);
+        var tiles = tilemap.GetTilesBlock(new BoundsInt(0, 0, 0, 30, 10, 1));
+        Debug.Log(tiles.Length);
     }
 
     void Start()
