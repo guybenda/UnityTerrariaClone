@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Utils
 {
+    /** Track matrix changes with this collection
+     * NOT thread-safe
+     */
     public class TrackableMatrix<T>
     {
         private readonly T[,] data;

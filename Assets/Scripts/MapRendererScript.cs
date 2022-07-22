@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapRendererScript : MonoBehaviour
+/*public class MapRendererScript : MonoBehaviour
 {
     private Map map;
 
@@ -39,4 +39,4 @@ public class MapRendererScript : MonoBehaviour
     {
         
     }
-}
+}*/

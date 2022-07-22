@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TileScript : MonoBehaviour
+/*public class TileScript : MonoBehaviour
 {
     private Tile _tile;
     public Tile Tile
@@ -71,4 +71,4 @@ public class TileScript : MonoBehaviour
 
         return tileObject;
     }
-}
+}*/

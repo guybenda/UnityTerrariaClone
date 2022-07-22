@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Assets.Scripts.Game
 {
@@ -17,11 +18,17 @@ namespace Assets.Scripts.Game
     public class Tile
     {
         public TileId id;
-        public SpriteId sprite;
-        public bool solid=true;
+        public TileBase tile;
 
-        public static readonly Tile[] Tiles = InitializeTiles();
-        public static readonly Tile Default = Tiles[0];
+        public static readonly Tile[] Tiles;
+
+        private static TileBase[] internalTiles;
+
+        static Tile()
+        {
+            internalTiles = LoadTiles();
+            Tiles = InitializeTiles();
+        }
 
         private static Tile[] InitializeTiles()
         {
@@ -30,22 +37,29 @@ namespace Assets.Scripts.Game
                 new Tile
                 {
                     id = TileId.Air,
-                    sprite = SpriteId.Air,
-                    solid = false
+                    tile = TileByName("Air"),
                 },
                 new Tile
                 {
                     id = TileId.Dirt,
-                    sprite = SpriteId.Dirt
+                    tile = TileByName("Dirt"),
                 },
                 new Tile
                 {
                     id = TileId.Stone,
-                    sprite = SpriteId.Stone
+                    tile = TileByName("Stone"),
                 }
             };
         }
 
+        private static TileBase[] LoadTiles()
+        {
+            return Resources.LoadAll<TileBase>("Tiles");
+        }
+        private static TileBase TileByName(string name)
+        {
+            return internalTiles.Where(x => x.name == name).FirstOrDefault();
+        }
 
         public static Tile ById(TileId id)
         {
