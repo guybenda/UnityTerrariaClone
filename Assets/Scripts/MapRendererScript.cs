@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MapRendererScript : MonoBehaviour
 {
-    public Map map;
+    private Map map;
 
     TileScript[,] tiles;
 

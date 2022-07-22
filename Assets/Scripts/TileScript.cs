@@ -61,7 +61,6 @@ public class TileScript : MonoBehaviour
         if (prefab == null)
         {
             prefab = Resources.Load<GameObject>("Prefabs/Tile");
-            Debug.Log(prefab);
         }
 
         var tileObject = Instantiate(prefab);
