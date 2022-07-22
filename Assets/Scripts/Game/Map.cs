@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Assets.Scripts.Game
 {
     public class MapTiles
     {
-        private TileId[,] _tiles;
+        private readonly TileId[,] _tiles;
 
         public TileId this[int w, int h]
         {

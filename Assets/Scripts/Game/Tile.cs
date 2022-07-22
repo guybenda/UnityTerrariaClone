@@ -8,7 +8,7 @@ using UnityEngine.Tilemaps;
 
 namespace Assets.Scripts.Game
 {
-    public enum TileId
+    public enum TileId: byte
     {
         Air,
         Dirt,
