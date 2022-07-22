@@ -18,6 +18,7 @@ namespace Assets.Scripts.Game
     {
         public TileId id;
         public SpriteId sprite;
+        public bool solid=true;
 
         public static readonly Tile[] Tiles = InitializeTiles();
         public static readonly Tile Default = Tiles[0];
@@ -29,7 +30,8 @@ namespace Assets.Scripts.Game
                 new Tile
                 {
                     id = TileId.Air,
-                    sprite = SpriteId.Air
+                    sprite = SpriteId.Air,
+                    solid = false
                 },
                 new Tile
                 {

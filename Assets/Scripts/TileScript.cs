@@ -14,6 +14,7 @@ public class TileScript : MonoBehaviour
             _tile = value;
             spriteRenderer.sprite = value?.sprite.Sprite().sprite;
             spriteRenderer.color = value?.sprite.Sprite().color ?? Color.black;
+            boxCollider.enabled = value?.solid ?? false;
         }
     }
 
@@ -42,10 +43,12 @@ public class TileScript : MonoBehaviour
     private static GameObject prefab;
 
     SpriteRenderer spriteRenderer;
+    BoxCollider2D boxCollider;
 
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        boxCollider = GetComponent<BoxCollider2D>();
     }
 
     void Start()
