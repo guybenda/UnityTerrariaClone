@@ -2,19 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class PlayerConsts
+public struct PlayerConsts
 {
     public static readonly float PLAYER_HEIGHT = 2.79f;
     public static readonly float PLAYER_WIDTH = 1.79f;
 
-    public static readonly float MAX_SPEED_REGULAR = 11f;
-    public static readonly float ACCEL_FORCE_REGULAR = 1f;
+    public static readonly float MAX_SPEED_REGULAR = 11.25f;
+    public static readonly float ACCELERATION_REGULAR = 0.64f;
+    public static readonly float SLOWDOWN_REGULAR = 1.6f;
 
-    public static readonly float JUMP_SPEED_REGULAR = 17.2875f;
+    public static readonly float JUMP_SPEED_REGULAR = 17f;
     public static readonly float JUMP_TIME_REGULAR = 0.267f;
-
-    public static readonly float SPEED_ACCEL_LERP = 0.07f;
-    public static readonly float SPEED_BRAKE_LERP = 0.3f;
 }
 
 public class PlayerScript : MonoBehaviour
@@ -53,8 +51,9 @@ public class PlayerScript : MonoBehaviour
     {
         Grounded = CheckGrounded();
 
+        HorizontalMovement();
         Movement();
-        ClampVelocity();
+        ClampVerticalVelocity();
 
         jump = false;
     }
@@ -66,27 +65,74 @@ public class PlayerScript : MonoBehaviour
         cam.transform.position = newPos;
     }
 
-    void Movement()
+    void HorizontalMovement()
     {
-        // Movement
-        var horizontalVelocity = rb.velocity.x;
+        var currentVelocity = rb.velocity.x;
+        var newVelocity = rb.velocity.x;
 
-        if (targetMovement == 0f)
+        if (targetMovement > 0 && currentVelocity > -PlayerConsts.MAX_SPEED_REGULAR)
         {
-            if (rb.velocity.x > 0)
+            if (Mathf.Abs(rb.velocity.y) < 0.01f)
             {
-                rb.velocity = new(Mathf.Clamp(rb.velocity.x, 0f, rb.velocity.x - PlayerConsts.SPEED_BRAKE_LERP), rb.velocity.y);
+                if (currentVelocity > PlayerConsts.SLOWDOWN_REGULAR)
+                {
+                    newVelocity -= PlayerConsts.SLOWDOWN_REGULAR;
+                }
+
+                newVelocity -= PlayerConsts.ACCELERATION_REGULAR;
             }
-            else
+        }
+        else if (targetMovement < 0 && currentVelocity < PlayerConsts.MAX_SPEED_REGULAR)
+        {
+            if (Mathf.Abs(rb.velocity.y) < 0.01f)
             {
-                rb.velocity = new(Mathf.Clamp(rb.velocity.x, rb.velocity.x + PlayerConsts.SPEED_BRAKE_LERP, 0f), rb.velocity.y);
+                if (currentVelocity < -PlayerConsts.SLOWDOWN_REGULAR)
+                {
+                    newVelocity += PlayerConsts.SLOWDOWN_REGULAR;
+                }
+
+                newVelocity += PlayerConsts.ACCELERATION_REGULAR;
             }
         }
         else
         {
-            rb.velocity = new(Mathf.Lerp(horizontalVelocity, targetMovement, PlayerConsts.SPEED_ACCEL_LERP), rb.velocity.y);
+            if (Mathf.Abs(rb.velocity.y) < 0.01f)
+            {
+                if (currentVelocity > PlayerConsts.SLOWDOWN_REGULAR * 0.5f)
+                {
+                    newVelocity -= PlayerConsts.SLOWDOWN_REGULAR * 0.5f;
+                }
+                else if (currentVelocity < (double)(0f - PlayerConsts.SLOWDOWN_REGULAR) * 0.5)
+                {
+                    newVelocity += PlayerConsts.SLOWDOWN_REGULAR * 0.5f;
+                }
+                else
+                {
+                    newVelocity = 0f;
+                }
+            }
+            else
+            {
+                if (currentVelocity > PlayerConsts.SLOWDOWN_REGULAR)
+                {
+                    newVelocity -= PlayerConsts.SLOWDOWN_REGULAR;
+                }
+                else if (currentVelocity < -PlayerConsts.SLOWDOWN_REGULAR)
+                {
+                    newVelocity += PlayerConsts.SLOWDOWN_REGULAR;
+                }
+                else
+                {
+                    newVelocity = 0f;
+                }
+            }
         }
 
+        rb.velocity = new(newVelocity, rb.velocity.y);
+    }
+
+    void Movement()
+    {
         // Jump
         if (Grounded && jump)
         {
@@ -187,7 +233,7 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    void ClampVelocity()
+    void ClampVerticalVelocity()
     {
         rb.velocity = new(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -36.5f, float.MaxValue));
     }
