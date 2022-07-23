@@ -339,11 +339,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0086c2e670fd758458700fc2a1d40e08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxSpeed: 4
-  Acceleration: 6
-  JumpForce: 2
-  JumpTime: 0.5
-  BrakeSpeed: 2
+  MaxSpeed: 11
+  Acceleration: 1
+  JumpForce: 17.2875
+  JumpTime: 0.267
+  BrakeSpeed: 6
   Grounded: 0
 --- !u!114 &1322894180
 MonoBehaviour:

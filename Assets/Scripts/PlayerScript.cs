@@ -14,21 +14,26 @@ public static class PlayerConsts
     public static readonly float JUMP_TIME_REGULAR = 0.267f;
 
     public static readonly float SPEED_BRAKE_REGULAR = 6f;
+
+    public static readonly float SPEED_ACCEL_LERP = 0.07f;
+    public static readonly float SPEED_BRAKE_LERP = 0.12f;
 }
 
 public class PlayerScript : MonoBehaviour
 {
-    public float MaxSpeed = PlayerConsts.MAX_SPEED_REGULAR;
-    public float Acceleration = PlayerConsts.ACCEL_FORCE_REGULAR;
-    public float JumpForce = PlayerConsts.JUMP_SPEED_REGULAR;
-    public float JumpTime = PlayerConsts.JUMP_TIME_REGULAR;
-    public float BrakeSpeed = PlayerConsts.SPEED_BRAKE_REGULAR;
-    public bool Grounded = false;
+    private float MaxSpeed = PlayerConsts.MAX_SPEED_REGULAR;
+    private float Acceleration = PlayerConsts.ACCEL_FORCE_REGULAR;
+    private float JumpForce = PlayerConsts.JUMP_SPEED_REGULAR;
+    private float JumpTime = PlayerConsts.JUMP_TIME_REGULAR;
+    private float BrakeSpeed = PlayerConsts.SPEED_BRAKE_REGULAR;
+    private bool Grounded = false;
 
     private bool jump = false;
-    private float movement = 0f;
-    private bool lastPressedA = false;
     private float currentJumpTimer = 0f;
+
+    private float targetMovement = 0f;
+
+    private bool lastPressedA = false;
 
     Camera cam;
     Rigidbody2D rb;
@@ -48,48 +53,16 @@ public class PlayerScript : MonoBehaviour
     {
         UpdateCameraPosition();
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            jump = true;
-        }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            lastPressedA = true;
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            lastPressedA = false;
-        }
-
-        if (lastPressedA)
-        {
-
-            if (Input.GetKey(KeyCode.A))
-            {
-                movement = -PlayerConsts.MAX_SPEED_REGULAR;
-            }
-            else if (Input.GetKey(KeyCode.D))
-            {
-                movement = PlayerConsts.MAX_SPEED_REGULAR;
-            }
-        }
-        else
-        {
-            if (Input.GetKey(KeyCode.D))
-            {
-                movement = PlayerConsts.MAX_SPEED_REGULAR;
-            }
-            else if (Input.GetKey(KeyCode.A))
-            {
-                movement = -PlayerConsts.MAX_SPEED_REGULAR;
-            }
-        }
+        HandleInput();
     }
 
     void FixedUpdate()
     {
+        Grounded = CheckGrounded();
+
         Movement();
+
+        jump = false;
     }
 
     void UpdateCameraPosition()
@@ -101,72 +74,41 @@ public class PlayerScript : MonoBehaviour
 
     void Movement()
     {
-        Grounded = CheckGrounded();
+        // Movement
+        var horizontalVelocity = rb.velocity.x;
 
-        /*if (Input.GetKey(KeyCode.D))
-        {
-            rb.AddRelativeForce(new Vector2(Acceleration, 0f), ForceMode2D.Impulse);
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            rb.AddRelativeForce(new Vector2(-Acceleration, 0f), ForceMode2D.Impulse);
-        }*/
+        //if (Mathf.Abs(horizontalVelocity)
+        var newHorizontalVelocity = new Vector2(Mathf.Lerp(horizontalVelocity, targetMovement, PlayerConsts.SPEED_BRAKE_LERP), rb.velocity.y);
 
-        if (Input.GetKey(KeyCode.D))
-        {
-            var v = rb.velocity;
-            rb.velocity = Vector2.SmoothDamp(rb.velocity, new Vector2(0f, PlayerConsts.MAX_SPEED_REGULAR), ref v, 0.5f, PlayerConsts.MAX_SPEED_REGULAR);
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            var v = rb.velocity;
-            rb.velocity = Vector2.SmoothDamp(rb.velocity, new Vector2(0f, -PlayerConsts.MAX_SPEED_REGULAR), ref v, 0.5f, PlayerConsts.MAX_SPEED_REGULAR);
-        }
+        rb.velocity = newHorizontalVelocity;
 
+        // Jump
         if (Grounded && jump)
         {
-            rb.AddRelativeForce(new(0f, PlayerConsts.JUMP_SPEED_REGULAR), ForceMode2D.Impulse);
+            //rb.AddRelativeForce(new(0f, PlayerConsts.JUMP_SPEED_REGULAR), ForceMode2D.Impulse);
+            var newVelocity = rb.velocity;
+            newVelocity.y = PlayerConsts.JUMP_SPEED_REGULAR;
+            rb.velocity = newVelocity;
             currentJumpTimer = PlayerConsts.JUMP_TIME_REGULAR;
         }
         else if (!Grounded && Input.GetKey(KeyCode.Space) && currentJumpTimer > 0f)
         {
             rb.AddRelativeForce(-Physics2D.gravity, ForceMode2D.Force);
+
         }
         else if (!Grounded && !Input.GetKey(KeyCode.Space) && currentJumpTimer > 0f)
         {
             currentJumpTimer = 0f;
         }
 
-        jump = false;
-        /*
-        //TODO FIX THIS SHIT
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            currentJumpTimer = 0f;
-        }
+        currentJumpTimer -= Time.fixedDeltaTime;
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (Grounded)
-            {
-                rb.AddRelativeForce(new(0f, PlayerConsts.JUMP_SPEED_REGULAR), ForceMode2D.Impulse);
-                currentJumpTimer = PlayerConsts.JUMP_TIME_REGULAR;
-            }
-        }
-        else if (Input.GetKey(KeyCode.Space))
-        {
-            if (!Grounded && currentJumpTimer>0f)
-            {
-                rb.AddRelativeForce(-Physics2D.gravity, ForceMode2D.Force);
-            }
-        }*/
 
         if (rb.velocity.x > PlayerConsts.MAX_SPEED_REGULAR)
         {
-            rb.AddRelativeForce(new Vector2(-rb.velocity.x, 0).normalized * PlayerConsts.SPEED_BRAKE_REGULAR);
+            //rb.AddRelativeForce(new Vector2(-rb.velocity.x, 0).normalized * PlayerConsts.SPEED_BRAKE_REGULAR);
         }
 
-        currentJumpTimer -= Time.fixedDeltaTime;
     }
 
     bool CheckGrounded()
@@ -175,12 +117,12 @@ public class PlayerScript : MonoBehaviour
         const int LAYER_MASK = ~(1 << 8);
 
         var point1 = new Vector2(
-            transform.position.x - (PlayerConsts.PLAYER_WIDTH / 2),
+            transform.position.x - (PlayerConsts.PLAYER_WIDTH / 2) + BOTTOM_MARGIN,
             transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) + BOTTOM_MARGIN
         );
 
         var point2 = new Vector2(
-            transform.position.x + (PlayerConsts.PLAYER_WIDTH / 2),
+            transform.position.x + (PlayerConsts.PLAYER_WIDTH / 2) - BOTTOM_MARGIN,
             transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) - BOTTOM_MARGIN
         );
 
@@ -188,6 +130,57 @@ public class PlayerScript : MonoBehaviour
         var hit = Physics2D.OverlapArea(point1, point2, LAYER_MASK);
 
         return hit != null;
+    }
+
+    void HandleInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            jump = true;
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            lastPressedA = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            lastPressedA = false;
+        }
+
+        // TODO make this less shit
+        if (lastPressedA)
+        {
+
+            if (Input.GetKey(KeyCode.A))
+            {
+                targetMovement = -PlayerConsts.MAX_SPEED_REGULAR;
+            }
+            else if (Input.GetKey(KeyCode.D))
+            {
+                targetMovement = PlayerConsts.MAX_SPEED_REGULAR;
+            }
+            else
+            {
+                targetMovement = 0f;
+            }
+        }
+        else
+        {
+            if (Input.GetKey(KeyCode.D))
+            {
+                targetMovement = PlayerConsts.MAX_SPEED_REGULAR;
+            }
+            else if (Input.GetKey(KeyCode.A))
+            {
+                targetMovement = -PlayerConsts.MAX_SPEED_REGULAR;
+            }
+            else
+            {
+                targetMovement = 0f;
+            }
+        }
     }
 
     void ClampHorizontalVelocity()
