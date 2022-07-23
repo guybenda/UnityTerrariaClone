@@ -13,19 +13,12 @@ public static class PlayerConsts
     public static readonly float JUMP_SPEED_REGULAR = 17.2875f;
     public static readonly float JUMP_TIME_REGULAR = 0.267f;
 
-    public static readonly float SPEED_BRAKE_REGULAR = 6f;
-
     public static readonly float SPEED_ACCEL_LERP = 0.07f;
-    public static readonly float SPEED_BRAKE_LERP = 0.12f;
+    public static readonly float SPEED_BRAKE_LERP = 0.3f;
 }
 
 public class PlayerScript : MonoBehaviour
 {
-    private float MaxSpeed = PlayerConsts.MAX_SPEED_REGULAR;
-    private float Acceleration = PlayerConsts.ACCEL_FORCE_REGULAR;
-    private float JumpForce = PlayerConsts.JUMP_SPEED_REGULAR;
-    private float JumpTime = PlayerConsts.JUMP_TIME_REGULAR;
-    private float BrakeSpeed = PlayerConsts.SPEED_BRAKE_REGULAR;
     private bool Grounded = false;
 
     private bool jump = false;
@@ -61,6 +54,7 @@ public class PlayerScript : MonoBehaviour
         Grounded = CheckGrounded();
 
         Movement();
+        ClampVelocity();
 
         jump = false;
     }
@@ -77,10 +71,21 @@ public class PlayerScript : MonoBehaviour
         // Movement
         var horizontalVelocity = rb.velocity.x;
 
-        //if (Mathf.Abs(horizontalVelocity)
-        var newHorizontalVelocity = new Vector2(Mathf.Lerp(horizontalVelocity, targetMovement, PlayerConsts.SPEED_BRAKE_LERP), rb.velocity.y);
-
-        rb.velocity = newHorizontalVelocity;
+        if (targetMovement == 0f)
+        {
+            if (rb.velocity.x > 0)
+            {
+                rb.velocity = new(Mathf.Clamp(rb.velocity.x, 0f, rb.velocity.x - PlayerConsts.SPEED_BRAKE_LERP), rb.velocity.y);
+            }
+            else
+            {
+                rb.velocity = new(Mathf.Clamp(rb.velocity.x, rb.velocity.x + PlayerConsts.SPEED_BRAKE_LERP, 0f), rb.velocity.y);
+            }
+        }
+        else
+        {
+            rb.velocity = new(Mathf.Lerp(horizontalVelocity, targetMovement, PlayerConsts.SPEED_ACCEL_LERP), rb.velocity.y);
+        }
 
         // Jump
         if (Grounded && jump)
@@ -91,14 +96,13 @@ public class PlayerScript : MonoBehaviour
             rb.velocity = newVelocity;
             currentJumpTimer = PlayerConsts.JUMP_TIME_REGULAR;
         }
+        else if ((!Grounded && !Input.GetKey(KeyCode.Space) && currentJumpTimer > 0f) || rb.velocity.y <= 0.1f)
+        {
+            currentJumpTimer = 0f;
+        }
         else if (!Grounded && Input.GetKey(KeyCode.Space) && currentJumpTimer > 0f)
         {
             rb.AddRelativeForce(-Physics2D.gravity, ForceMode2D.Force);
-
-        }
-        else if (!Grounded && !Input.GetKey(KeyCode.Space) && currentJumpTimer > 0f)
-        {
-            currentJumpTimer = 0f;
         }
 
         currentJumpTimer -= Time.fixedDeltaTime;
@@ -183,15 +187,8 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    void ClampHorizontalVelocity()
+    void ClampVelocity()
     {
-        if (Grounded)
-        {
-
-        }
-        else
-        {
-
-        }
+        rb.velocity = new(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -36.5f, float.MaxValue));
     }
 }
