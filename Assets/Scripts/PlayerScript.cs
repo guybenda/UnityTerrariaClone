@@ -8,8 +8,11 @@ public struct PlayerConsts
     public static readonly float PLAYER_WIDTH = 1.79f;
 
     public static readonly float MAX_SPEED_REGULAR = 11.25f;
-    public static readonly float ACCELERATION_REGULAR = 0.64f;
-    public static readonly float SLOWDOWN_REGULAR = 1.6f;
+    public static readonly float ACCELERATION_REGULAR = 0.3f;
+
+    public static readonly float BRAKE_REGULAR = 0.75f;
+
+    public static readonly float AIR_CONTROLL_MULT = 0.5f;
 
     public static readonly float JUMP_SPEED_REGULAR = 17f;
     public static readonly float JUMP_TIME_REGULAR = 0.267f;
@@ -68,7 +71,49 @@ public class PlayerScript : MonoBehaviour
     void HorizontalMovement()
     {
         var currentVelocity = rb.velocity.x;
+
         var newVelocity = rb.velocity.x;
+
+        var verticalVelocity = rb.velocity.y;
+        bool standingStill = rb.velocity.x < 0.001;
+
+        float forceToApply = (Mathf.Abs(currentVelocity) > Mathf.Abs(targetMovement)) ? 
+
+
+        /*
+        bool oppositeMagnitude = Mathf.Sign(currentVelocity) != Mathf.Sign(targetMovement);
+        var forceToBeAppllied = targetMovement;
+
+        if (!Grounded) forceToBeAppllied *= PlayerConsts.AIR_CONTROLL_MULT;
+
+        if (!oppositeMagnitude || standingStill)
+        {
+            if (Mathf.Abs(currentVelocity) > PlayerConsts.MAX_SPEED_REGULAR)
+            {
+                newVelocity -= Mathf.Sign(currentVelocity) * Mathf.Clamp(currentVelocity, 0, PlayerConsts.BRAKE_REGULAR);
+            }
+            else
+            {
+                newVelocity = Mathf.Clamp(currentVelocity += forceToBeAppllied,-PlayerConsts.MAX_SPEED_REGULAR, PlayerConsts.MAX_SPEED_REGULAR);
+                //rb.AddRelativeForce(new Vector2(forceToBeAppllied, 0f), ForceMode2D.Impulse);
+            }
+
+        }
+        else if (targetMovement == 0f || oppositeMagnitude)
+        {
+            newVelocity -= Mathf.Sign(currentVelocity) * Mathf.Clamp(currentVelocity, 0, PlayerConsts.BRAKE_REGULAR);
+            //rb.velocity = new(Mathf.Clamp())
+        }*/
+
+        if (Mathf.Abs(newVelocity) < 0.001)
+        {
+            newVelocity = 0f;
+        }
+
+        /*
+         * 
+            rb.AddRelativeForce(new Vector2(10f, 0f), ForceMode2D.Impulse);
+
 
         if (targetMovement > 0 && currentVelocity > -PlayerConsts.MAX_SPEED_REGULAR)
         {
@@ -126,7 +171,7 @@ public class PlayerScript : MonoBehaviour
                     newVelocity = 0f;
                 }
             }
-        }
+        }*/
 
         rb.velocity = new(newVelocity, rb.velocity.y);
     }
@@ -163,7 +208,7 @@ public class PlayerScript : MonoBehaviour
 
     bool CheckGrounded()
     {
-        const float BOTTOM_MARGIN = 0.1f;
+        const float BOTTOM_MARGIN = 0.05f;
         const int LAYER_MASK = ~(1 << 8);
 
         var point1 = new Vector2(
