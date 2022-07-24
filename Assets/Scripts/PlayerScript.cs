@@ -1,3 +1,4 @@
+using Assets.Scripts.Game;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -346,11 +347,14 @@ public class PlayerScript : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            var mousePosition = cam.ScreenToWorldPoint( Input.mousePosition);
+            var mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
 
-            var tile = map.tilemap.WorldToCell( mousePosition );
+            var pos = map.Tilemap.WorldToCell(mousePosition);
 
-            Debug.DrawRay(new(), tile, Color.red, 0.5f);
+            map.Map.Tiles[pos.x, pos.y] = TileId.Dirt;
+
+
+            //Debug.DrawRay(new(), pos, Color.red, 0.5f);
         }
     }
 

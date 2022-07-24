@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,24 +8,9 @@ using UnityEngine;
 
 namespace Assets.Scripts.Game
 {
-    public class MapTiles
-    {
-        private readonly TileId[,] _tiles;
-
-        public TileId this[int w, int h]
-        {
-            get { return _tiles[w, h]; }
-            set
-            {
-                _tiles[w, h] = value;
-                // TODO implement updates queue
-            }
-        }
-    }
-
     public class Map
     {
-        public readonly TileId[,] Tiles;
+        public readonly TrackableTiles Tiles;
 
 
         public int Height { get; private set; }
@@ -32,7 +18,7 @@ namespace Assets.Scripts.Game
 
         public Map(int width, int height)
         {
-            Tiles = new TileId[width, height];
+            Tiles = new TrackableTiles(width, height);
             Height = height;
             Width = width;
         }
