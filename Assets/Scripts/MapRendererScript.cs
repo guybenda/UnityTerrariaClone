@@ -1,42 +1,75 @@
 using Assets.Scripts.Game;
+using Assets.Scripts.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-/*public class MapRendererScript : MonoBehaviour
+public class MapRendererScript : MonoBehaviour
 {
-    private Map map;
+    public Map Map { get; private set; }
 
-    TileScript[,] tiles;
+    public Tilemap Tilemap { get; private set; }
 
     void Awake()
     {
-        map = Map.GetDefaultMap();
-
-        tiles = new TileScript[map.Width, map.Height];
-
-        for (int w = 0; w < map.Tiles.GetLength(0); w++)
-        {
-            for (int h = 0; h < map.Tiles.GetLength(1); h++)
-            {
-                tiles[w,h] = TileScript.CreateTile(map.Tiles[w,h].Tile(), new Vector2Int(w,h)).GetComponent<TileScript>();
-
-                tiles[w, h].transform.parent = gameObject.transform;
-            }
-        }
+        Tilemap = GetComponentInChildren<Tilemap>();
     }
 
     void Start()
     {
+        Map = Map.GetDefaultMap();
 
-        for (int i = 0; i < tiles.Length; i++)
+        Tilemap.ClearAllTiles();
+
+        Stopwatch stopWatch = new();
+        stopWatch.Start();
+
+        for (int w = 0; w < Map.Tiles.GetLength(0); w++)
         {
-
+            for (int h = 0; h < Map.Tiles.GetLength(1); h++)
+            {
+                Tilemap.SetTile(new Vector3Int(w, h), Map.Tiles[w, h].Tile().tile);
+            }
         }
+
+        stopWatch.Stop();
+        TimeSpan ts = stopWatch.Elapsed;
+
+        UnityEngine.Debug.Log("Initial render took " + ts.TotalMilliseconds + "ms");
     }
 
     void Update()
     {
-        
+
     }
-}*/
+
+    void FixedUpdate()
+    {
+        RenderChanges();
+    }
+
+    void RenderChanges()
+    {
+        Stopwatch stopWatch = new();
+        stopWatch.Start();
+
+        var counter = 0;
+
+        foreach (var position in Map.Tiles.changes)
+        {
+            Tilemap.SetTile(position.Vector(), Map.Tiles[position.Item1, position.Item2].Tile().tile);
+            counter++;
+        }
+
+        Map.Tiles.changes.Clear();
+
+        stopWatch.Stop();
+        TimeSpan ts = stopWatch.Elapsed;
+
+        if (counter > 0)
+            UnityEngine.Debug.Log("Rendered " + counter + " tiles in " + ts.TotalMilliseconds + "ms");
+    }
+}

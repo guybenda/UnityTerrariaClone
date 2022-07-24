@@ -5,9 +5,6 @@ using UnityEngine;
 
 public struct PlayerConsts
 {
-    public static readonly float PLAYER_HEIGHT = 2.625f;
-    public static readonly float PLAYER_WIDTH = 1.25f;
-
     public static readonly float MAX_SPEED_REGULAR = 11.25f;
     public static readonly float ACCELERATION_REGULAR = 0.3f;
     public static readonly float BRAKE_REGULAR = 0.75f;
@@ -16,28 +13,40 @@ public struct PlayerConsts
 
     public static readonly float JUMP_SPEED_REGULAR = 17f;
     public static readonly float JUMP_TIME_REGULAR = 0.267f;
+
+    public static readonly float RANGE = 5f;
+
 }
 
 public class PlayerScript : MonoBehaviour
 {
     private bool Grounded = false;
-
     private bool jump = false;
     private float currentJumpTimer = 0f;
-
     private float targetMovement = 0f;
-
     private bool lastPressedA = false;
+
+    private Vector2 centerOfScreen;
+    private float height;
+    private float width;
+    private Vector2 hitboxOffset;
+
 
     Camera cam;
     Rigidbody2D rb;
-    MapRendererV2Script map;
+    BoxCollider2D boxCollider;
+    MapRendererScript map;
 
     void Awake()
     {
         cam = Camera.main;
         rb = GetComponent<Rigidbody2D>();
-        map = GameObject.FindGameObjectWithTag("Map").GetComponent<MapRendererV2Script>();
+        map = GameObject.FindGameObjectWithTag("Map").GetComponent<MapRendererScript>();
+        boxCollider = GetComponent<BoxCollider2D>();
+
+        width = boxCollider.size.x;
+        height = boxCollider.size.y;
+        hitboxOffset = boxCollider.offset;
     }
 
     void Start()
@@ -67,7 +76,7 @@ public class PlayerScript : MonoBehaviour
 
     void UpdateCameraPosition()
     {
-        var newPos = transform.position;
+        var newPos = transform.position - (Vector3)hitboxOffset;
         newPos.z = -10;
         cam.transform.position = newPos;
     }
@@ -78,71 +87,54 @@ public class PlayerScript : MonoBehaviour
 
         var newVelocity = rb.velocity.x;
 
-        var verticalVelocity = rb.velocity.y;
-        bool standingStill = rb.velocity.x < 0.001;
-
         float brakeForce = -Mathf.Sign(currentVelocity) * PlayerConsts.BRAKE_REGULAR;
 
         float accelForce = Mathf.Sign(targetMovement) * PlayerConsts.ACCELERATION_REGULAR;
-        if (Mathf.Abs(currentVelocity) + Mathf.Abs(accelForce) > PlayerConsts.MAX_SPEED_REGULAR)
+        /*if (Mathf.Abs(currentVelocity) + Mathf.Abs(accelForce) > PlayerConsts.MAX_SPEED_REGULAR)
         {
             Debug.Log("MAX SPEED!!!!!!!!!!!!! " + currentVelocity);
 
             accelForce -= (PlayerConsts.MAX_SPEED_REGULAR - (Mathf.Abs(currentVelocity) + Mathf.Abs(accelForce))) * Mathf.Sign(currentVelocity);
-        }
+        }*/
 
-        if (!Grounded) accelForce *= PlayerConsts.AIR_CONTROLL_MULT;
+        if (!Grounded)
+        {
+            accelForce *= PlayerConsts.AIR_CONTROLL_MULT;
+            brakeForce *= PlayerConsts.AIR_CONTROLL_MULT;
+        }
 
 
         if (Mathf.Abs(currentVelocity) > PlayerConsts.MAX_SPEED_REGULAR + 0.25f)
         {
             Debug.Log("MAX SPEED! " + currentVelocity);
-            newVelocity *= 0.9f;
+            newVelocity = Mathf.Max(newVelocity, newVelocity * 0.9f);
         }
 
         if (targetMovement == 0f)
         {
-            newVelocity += brakeForce;
+            newVelocity += brakeForce * 0.8f;
 
             if (Mathf.Sign(newVelocity) != Mathf.Sign(currentVelocity))
             {
                 newVelocity = 0f;
             }
         }
-        else if (targetMovement > 0f)
+        else
         {
-            if (currentVelocity < 0f)
+            if (Mathf.Sign(currentVelocity) != Mathf.Sign(targetMovement))
             {
                 newVelocity += brakeForce;
             }
-            else if (currentVelocity > newVelocity)
+            else if (Mathf.Abs(currentVelocity) > Mathf.Abs(newVelocity))
             {
                 Debug.Log("MAX SPEED! 1" + currentVelocity);
                 newVelocity += brakeForce;
             }
             else
             {
-                rb.AddRelativeForce(new(accelForce, 0), ForceMode2D.Impulse);
-                //newVelocity += accelForce;
-                //if (newVelocity > PlayerConsts.MAX_SPEED_REGULAR) newVelocity = PlayerConsts.MAX_SPEED_REGULAR;
-            }
-        }
-        else if (targetMovement < 0f)
-        {
-            if (currentVelocity > 0f)
-            {
-                newVelocity += brakeForce;
-            }
-            else if (currentVelocity < newVelocity)
-            {
-                Debug.Log("MAX SPEED! 2" + currentVelocity);
-                newVelocity += brakeForce;
-            }
-            else
-            {
-                rb.AddRelativeForce(new(accelForce, 0), ForceMode2D.Impulse);
-                //newVelocity += accelForce;
-                //if (newVelocity < -PlayerConsts.MAX_SPEED_REGULAR) newVelocity = -PlayerConsts.MAX_SPEED_REGULAR;
+                //rb.AddRelativeForce(new(accelForce, 0), ForceMode2D.Impulse);
+                newVelocity += accelForce;
+                if (Mathf.Abs(newVelocity) > PlayerConsts.MAX_SPEED_REGULAR) newVelocity = Mathf.Clamp(newVelocity, -PlayerConsts.MAX_SPEED_REGULAR, PlayerConsts.MAX_SPEED_REGULAR);
             }
         }
 
@@ -150,99 +142,6 @@ public class PlayerScript : MonoBehaviour
         {
             newVelocity = 0f;
         }
-
-
-        //float forceToApply = (Mathf.Abs(currentVelocity) > Mathf.Abs(targetMovement)) ? 
-
-
-        /*
-        bool oppositeMagnitude = Mathf.Sign(currentVelocity) != Mathf.Sign(targetMovement);
-        var forceToBeAppllied = targetMovement;
-
-        if (!Grounded) forceToBeAppllied *= PlayerConsts.AIR_CONTROLL_MULT;
-
-        if (!oppositeMagnitude || standingStill)
-        {
-            if (Mathf.Abs(currentVelocity) > PlayerConsts.MAX_SPEED_REGULAR)
-            {
-                newVelocity -= Mathf.Sign(currentVelocity) * Mathf.Clamp(currentVelocity, 0, PlayerConsts.BRAKE_REGULAR);
-            }
-            else
-            {
-                newVelocity = Mathf.Clamp(currentVelocity += forceToBeAppllied,-PlayerConsts.MAX_SPEED_REGULAR, PlayerConsts.MAX_SPEED_REGULAR);
-                //rb.AddRelativeForce(new Vector2(forceToBeAppllied, 0f), ForceMode2D.Impulse);
-            }
-
-        }
-        else if (targetMovement == 0f || oppositeMagnitude)
-        {
-            newVelocity -= Mathf.Sign(currentVelocity) * Mathf.Clamp(currentVelocity, 0, PlayerConsts.BRAKE_REGULAR);
-            //rb.velocity = new(Mathf.Clamp())
-        }*/
-
-
-        /*
-         * 
-            rb.AddRelativeForce(new Vector2(10f, 0f), ForceMode2D.Impulse);
-
-
-        if (targetMovement > 0 && currentVelocity > -PlayerConsts.MAX_SPEED_REGULAR)
-        {
-            if (Mathf.Abs(rb.velocity.y) < 0.01f)
-            {
-                if (currentVelocity > PlayerConsts.SLOWDOWN_REGULAR)
-                {
-                    newVelocity -= PlayerConsts.SLOWDOWN_REGULAR;
-                }
-
-                newVelocity -= PlayerConsts.ACCELERATION_REGULAR;
-            }
-        }
-        else if (targetMovement < 0 && currentVelocity < PlayerConsts.MAX_SPEED_REGULAR)
-        {
-            if (Mathf.Abs(rb.velocity.y) < 0.01f)
-            {
-                if (currentVelocity < -PlayerConsts.SLOWDOWN_REGULAR)
-                {
-                    newVelocity += PlayerConsts.SLOWDOWN_REGULAR;
-                }
-
-                newVelocity += PlayerConsts.ACCELERATION_REGULAR;
-            }
-        }
-        else
-        {
-            if (Mathf.Abs(rb.velocity.y) < 0.01f)
-            {
-                if (currentVelocity > PlayerConsts.SLOWDOWN_REGULAR * 0.5f)
-                {
-                    newVelocity -= PlayerConsts.SLOWDOWN_REGULAR * 0.5f;
-                }
-                else if (currentVelocity < (double)(0f - PlayerConsts.SLOWDOWN_REGULAR) * 0.5)
-                {
-                    newVelocity += PlayerConsts.SLOWDOWN_REGULAR * 0.5f;
-                }
-                else
-                {
-                    newVelocity = 0f;
-                }
-            }
-            else
-            {
-                if (currentVelocity > PlayerConsts.SLOWDOWN_REGULAR)
-                {
-                    newVelocity -= PlayerConsts.SLOWDOWN_REGULAR;
-                }
-                else if (currentVelocity < -PlayerConsts.SLOWDOWN_REGULAR)
-                {
-                    newVelocity += PlayerConsts.SLOWDOWN_REGULAR;
-                }
-                else
-                {
-                    newVelocity = 0f;
-                }
-            }
-        }*/
 
         rb.velocity = new(newVelocity, rb.velocity.y);
     }
@@ -269,30 +168,21 @@ public class PlayerScript : MonoBehaviour
 
         currentJumpTimer -= Time.fixedDeltaTime;
 
-
-        if (rb.velocity.x > PlayerConsts.MAX_SPEED_REGULAR)
-        {
-            //rb.AddRelativeForce(new Vector2(-rb.velocity.x, 0).normalized * PlayerConsts.SPEED_BRAKE_REGULAR);
-        }
-
     }
 
     bool CheckGrounded()
     {
-
-        // TODO get this in runtime
-        const float BOTTOM_MARGIN = 0.03f;
-        const float OFFSET = -0.0775f;
+        const float BOTTOM_MARGIN = 0.02f;
         const int LAYER_MASK = ~(1 << 8);
 
         var point1 = new Vector2(
-            transform.position.x - (PlayerConsts.PLAYER_WIDTH / 2) + BOTTOM_MARGIN,
-            transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) + BOTTOM_MARGIN + OFFSET
+            transform.position.x - (width / 2) + BOTTOM_MARGIN,
+            transform.position.y - (height / 2) + BOTTOM_MARGIN + hitboxOffset.y
         );
 
         var point2 = new Vector2(
-            transform.position.x + (PlayerConsts.PLAYER_WIDTH / 2) - BOTTOM_MARGIN,
-            transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) - BOTTOM_MARGIN + OFFSET
+            transform.position.x + (width / 2) - BOTTOM_MARGIN,
+            transform.position.y - (height / 2) - BOTTOM_MARGIN + hitboxOffset.y
         );
 
         Debug.DrawRay(point2, point1 - point2, Color.red, 0.1f);
