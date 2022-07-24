@@ -84,6 +84,12 @@ public class PlayerScript : MonoBehaviour
         float brakeForce = -Mathf.Sign(currentVelocity) * PlayerConsts.BRAKE_REGULAR;
 
         float accelForce = Mathf.Sign(targetMovement) * PlayerConsts.ACCELERATION_REGULAR;
+        if (Mathf.Abs(currentVelocity) + Mathf.Abs(accelForce) > PlayerConsts.MAX_SPEED_REGULAR)
+        {
+            Debug.Log("MAX SPEED!!!!!!!!!!!!! " + currentVelocity);
+
+            accelForce -= (PlayerConsts.MAX_SPEED_REGULAR - (Mathf.Abs(currentVelocity) + Mathf.Abs(accelForce))) * Mathf.Sign(currentVelocity);
+        }
 
         if (!Grounded) accelForce *= PlayerConsts.AIR_CONTROLL_MULT;
 
@@ -116,9 +122,9 @@ public class PlayerScript : MonoBehaviour
             }
             else
             {
-                newVelocity += accelForce;
-
-                if (newVelocity > PlayerConsts.MAX_SPEED_REGULAR) newVelocity = PlayerConsts.MAX_SPEED_REGULAR;
+                rb.AddRelativeForce(new(accelForce, 0), ForceMode2D.Impulse);
+                //newVelocity += accelForce;
+                //if (newVelocity > PlayerConsts.MAX_SPEED_REGULAR) newVelocity = PlayerConsts.MAX_SPEED_REGULAR;
             }
         }
         else if (targetMovement < 0f)
@@ -134,9 +140,9 @@ public class PlayerScript : MonoBehaviour
             }
             else
             {
-                newVelocity += accelForce;
-
-                if (newVelocity < -PlayerConsts.MAX_SPEED_REGULAR) newVelocity = -PlayerConsts.MAX_SPEED_REGULAR;
+                rb.AddRelativeForce(new(accelForce, 0), ForceMode2D.Impulse);
+                //newVelocity += accelForce;
+                //if (newVelocity < -PlayerConsts.MAX_SPEED_REGULAR) newVelocity = -PlayerConsts.MAX_SPEED_REGULAR;
             }
         }
 
@@ -280,12 +286,12 @@ public class PlayerScript : MonoBehaviour
         const int LAYER_MASK = ~(1 << 8);
 
         var point1 = new Vector2(
-            transform.position.x - (PlayerConsts.PLAYER_WIDTH / 2) + BOTTOM_MARGIN + OFFSET,
+            transform.position.x - (PlayerConsts.PLAYER_WIDTH / 2) + BOTTOM_MARGIN,
             transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) + BOTTOM_MARGIN + OFFSET
         );
 
         var point2 = new Vector2(
-            transform.position.x + (PlayerConsts.PLAYER_WIDTH / 2) - BOTTOM_MARGIN + OFFSET,
+            transform.position.x + (PlayerConsts.PLAYER_WIDTH / 2) - BOTTOM_MARGIN,
             transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) - BOTTOM_MARGIN + OFFSET
         );
 

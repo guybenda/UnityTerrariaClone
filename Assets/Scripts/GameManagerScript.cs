@@ -5,11 +5,10 @@ using UnityEngine;
 
 public class GameManagerScript : MonoBehaviour
 {
-    protected Map map;
 
     void Awake()
     {
-        map = Map.GetDefaultMap();
+        Camera.main.orthographicSize = Screen.height / 32f;
     }
 
     void Start()
