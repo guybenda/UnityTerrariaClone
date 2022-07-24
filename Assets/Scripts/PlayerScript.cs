@@ -5,8 +5,8 @@ using UnityEngine;
 
 public struct PlayerConsts
 {
-    public static readonly float PLAYER_HEIGHT = 2.79f;
-    public static readonly float PLAYER_WIDTH = 1.79f;
+    public static readonly float PLAYER_HEIGHT = 2.625f;
+    public static readonly float PLAYER_WIDTH = 1.25f;
 
     public static readonly float MAX_SPEED_REGULAR = 11.25f;
     public static readonly float ACCELERATION_REGULAR = 0.3f;
@@ -273,17 +273,20 @@ public class PlayerScript : MonoBehaviour
 
     bool CheckGrounded()
     {
-        const float BOTTOM_MARGIN = 0.05f;
+
+        // TODO get this in runtime
+        const float BOTTOM_MARGIN = 0.03f;
+        const float OFFSET = -0.0775f;
         const int LAYER_MASK = ~(1 << 8);
 
         var point1 = new Vector2(
-            transform.position.x - (PlayerConsts.PLAYER_WIDTH / 2) + BOTTOM_MARGIN,
-            transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) + BOTTOM_MARGIN
+            transform.position.x - (PlayerConsts.PLAYER_WIDTH / 2) + BOTTOM_MARGIN + OFFSET,
+            transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) + BOTTOM_MARGIN + OFFSET
         );
 
         var point2 = new Vector2(
-            transform.position.x + (PlayerConsts.PLAYER_WIDTH / 2) - BOTTOM_MARGIN,
-            transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) - BOTTOM_MARGIN
+            transform.position.x + (PlayerConsts.PLAYER_WIDTH / 2) - BOTTOM_MARGIN + OFFSET,
+            transform.position.y - (PlayerConsts.PLAYER_HEIGHT / 2) - BOTTOM_MARGIN + OFFSET
         );
 
         Debug.DrawRay(point2, point1 - point2, Color.red, 0.1f);

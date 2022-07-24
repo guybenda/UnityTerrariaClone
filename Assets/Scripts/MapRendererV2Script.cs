@@ -27,26 +27,18 @@ public class MapRendererV2Script : MonoBehaviour
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();
 
-        //var positions = new Vector3Int[map.Tiles.Length];
-        //var tiles = new TileBase[map.Tiles.Length];
-
         for (int w = 0; w < Map.Tiles.GetLength(0); w++)
         {
             for (int h = 0; h < Map.Tiles.GetLength(1); h++)
             {
-                //positions[map.Height * w + h] = new(w, h);
-                //tiles[map.Height * w + h] = map.Tiles[w, h].Tile().tile;
                 Tilemap.SetTile(new Vector3Int(w, h), Map.Tiles[w, h].Tile().tile);
             }
         }
 
-        //tilemap.SetTiles(positions, tiles);
-
         stopWatch.Stop();
-        // Get the elapsed time as a TimeSpan value.
         TimeSpan ts = stopWatch.Elapsed;
 
-        UnityEngine.Debug.Log(ts.TotalMilliseconds + "ms");
+        UnityEngine.Debug.Log("Initial render took " + ts.TotalMilliseconds + "ms");
     }
 
     void Update()
@@ -61,9 +53,23 @@ public class MapRendererV2Script : MonoBehaviour
 
     void RenderChanges()
     {
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+
+        var counter = 0;
+
         foreach (var position in Map.Tiles.changes)
         {
             Tilemap.SetTile(position.Vector(), Map.Tiles[position.Item1, position.Item2].Tile().tile);
+            counter++;
         }
+
+        Map.Tiles.changes.Clear();
+
+        stopWatch.Stop();
+        TimeSpan ts = stopWatch.Elapsed;
+
+        if (counter > 0)
+            UnityEngine.Debug.Log("Rendered " + counter + " tiles in " + ts.TotalMilliseconds + "ms");
     }
 }
