@@ -9,10 +9,9 @@ public struct PlayerConsts
 
     public static readonly float MAX_SPEED_REGULAR = 11.25f;
     public static readonly float ACCELERATION_REGULAR = 0.3f;
-
     public static readonly float BRAKE_REGULAR = 0.75f;
 
-    public static readonly float AIR_CONTROLL_MULT = 0.5f;
+    public static readonly float AIR_CONTROLL_MULT = 0.75f;
 
     public static readonly float JUMP_SPEED_REGULAR = 17f;
     public static readonly float JUMP_TIME_REGULAR = 0.267f;
@@ -31,11 +30,13 @@ public class PlayerScript : MonoBehaviour
 
     Camera cam;
     Rigidbody2D rb;
+    MapRendererV2Script map;
 
     void Awake()
     {
         cam = Camera.main;
         rb = GetComponent<Rigidbody2D>();
+        map = GameObject.FindGameObjectWithTag("Map").GetComponent<MapRendererV2Script>();
     }
 
     void Start()
@@ -47,7 +48,9 @@ public class PlayerScript : MonoBehaviour
     {
         UpdateCameraPosition();
 
-        HandleInput();
+        HandleKeyboardInput();
+
+        HandleMouseInput();
     }
 
     void FixedUpdate()
@@ -77,7 +80,72 @@ public class PlayerScript : MonoBehaviour
         var verticalVelocity = rb.velocity.y;
         bool standingStill = rb.velocity.x < 0.001;
 
-        float forceToApply = (Mathf.Abs(currentVelocity) > Mathf.Abs(targetMovement)) ? 
+        float brakeForce = -Mathf.Sign(currentVelocity) * PlayerConsts.BRAKE_REGULAR;
+
+        float accelForce = Mathf.Sign(targetMovement) * PlayerConsts.ACCELERATION_REGULAR;
+
+        if (!Grounded) accelForce *= PlayerConsts.AIR_CONTROLL_MULT;
+
+
+        if (Mathf.Abs(currentVelocity) > PlayerConsts.MAX_SPEED_REGULAR + 0.25f)
+        {
+            Debug.Log("MAX SPEED! " + currentVelocity);
+            newVelocity *= 0.9f;
+        }
+
+        if (targetMovement == 0f)
+        {
+            newVelocity += brakeForce;
+
+            if (Mathf.Sign(newVelocity) != Mathf.Sign(currentVelocity))
+            {
+                newVelocity = 0f;
+            }
+        }
+        else if (targetMovement > 0f)
+        {
+            if (currentVelocity < 0f)
+            {
+                newVelocity += brakeForce;
+            }
+            else if (currentVelocity > newVelocity)
+            {
+                Debug.Log("MAX SPEED! 1" + currentVelocity);
+                newVelocity += brakeForce;
+            }
+            else
+            {
+                newVelocity += accelForce;
+
+                if (newVelocity > PlayerConsts.MAX_SPEED_REGULAR) newVelocity = PlayerConsts.MAX_SPEED_REGULAR;
+            }
+        }
+        else if (targetMovement < 0f)
+        {
+            if (currentVelocity > 0f)
+            {
+                newVelocity += brakeForce;
+            }
+            else if (currentVelocity < newVelocity)
+            {
+                Debug.Log("MAX SPEED! 2" + currentVelocity);
+                newVelocity += brakeForce;
+            }
+            else
+            {
+                newVelocity += accelForce;
+
+                if (newVelocity < -PlayerConsts.MAX_SPEED_REGULAR) newVelocity = -PlayerConsts.MAX_SPEED_REGULAR;
+            }
+        }
+
+        if (Mathf.Abs(newVelocity) < 0.001)
+        {
+            newVelocity = 0f;
+        }
+
+
+        //float forceToApply = (Mathf.Abs(currentVelocity) > Mathf.Abs(targetMovement)) ? 
 
 
         /*
@@ -105,10 +173,6 @@ public class PlayerScript : MonoBehaviour
             //rb.velocity = new(Mathf.Clamp())
         }*/
 
-        if (Mathf.Abs(newVelocity) < 0.001)
-        {
-            newVelocity = 0f;
-        }
 
         /*
          * 
@@ -227,7 +291,7 @@ public class PlayerScript : MonoBehaviour
         return hit != null;
     }
 
-    void HandleInput()
+    void HandleKeyboardInput()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -275,6 +339,18 @@ public class PlayerScript : MonoBehaviour
             {
                 targetMovement = 0f;
             }
+        }
+    }
+
+    void HandleMouseInput()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            var mousePosition = cam.ScreenToWorldPoint( Input.mousePosition);
+
+            var tile = map.tilemap.WorldToCell( mousePosition );
+
+            Debug.DrawRay(new(), tile, Color.red, 0.5f);
         }
     }
 

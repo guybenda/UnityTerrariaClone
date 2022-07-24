@@ -10,13 +10,11 @@ public class MapRendererV2Script : MonoBehaviour
 {
     private Map map;
 
-    Tilemap tilemap;
+    public Tilemap tilemap { get; private set; }
 
     void Awake()
     {
-
         tilemap = GetComponentInChildren<Tilemap>();
-
     }
 
     void Start()

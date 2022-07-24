@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Game;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,5 +37,12 @@ namespace Assets.Scripts.Utils
         }
 
         public int Length { get { return data.Length; } }
+    }
+
+    public class TrackableTiles : TrackableMatrix<Tile>
+    {
+        public TrackableTiles(int x, int y) : base(x, y)
+        {
+        }
     }
 }
