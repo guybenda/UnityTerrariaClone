@@ -7,11 +7,24 @@ using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+public enum MapLayer
+{
+    Tiles = 0,
+    Ghost = 4
+}
+
 public class MapRendererScript : MonoBehaviour
 {
     public Map Map { get; private set; }
 
     public Tilemap Tilemap { get; private set; }
+
+    private TileId? currentGhost = null;
+    private Vector2Int currentGhostPosition = default;
+
+    private TileId? nextGhost = null;
+    private Vector2Int nextGhostPosition = default;
+
 
     void Awake()
     {
@@ -49,6 +62,13 @@ public class MapRendererScript : MonoBehaviour
     void FixedUpdate()
     {
         RenderChanges();
+        RenderGhost();
+    }
+
+    public void SetGhost(TileId tile, Vector2Int position)
+    {
+        nextGhost = tile;
+        nextGhostPosition = position;
     }
 
     void RenderChanges()
@@ -71,5 +91,20 @@ public class MapRendererScript : MonoBehaviour
 
         if (counter > 0)
             UnityEngine.Debug.Log("Rendered " + counter + " tiles in " + ts.TotalMilliseconds + "ms");
+    }
+
+    void RenderGhost()
+    {
+        if (currentGhost == nextGhost && currentGhostPosition == nextGhostPosition) return;
+
+        Tilemap.SetTile((Vector3Int)currentGhostPosition, null);
+
+        currentGhost = nextGhost;
+        currentGhostPosition = nextGhostPosition;
+
+        if (nextGhost == null) return;
+
+        Tilemap.SetTile((Vector3Int)nextGhostPosition, nextGhost.Value.Tile().tile);
+
     }
 }

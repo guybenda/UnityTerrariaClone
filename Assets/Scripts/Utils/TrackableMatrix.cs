@@ -33,6 +33,7 @@ namespace Assets.Scripts.Utils
             set
             {
                 if (x >= X || y >= Y || x < 0 || y < 0) return;
+                if (EqualityComparer<T>.Default.Equals(value, data[x, y])) return;
 
                 changes.Enqueue((x, y));
                 data[x, y] = value;
