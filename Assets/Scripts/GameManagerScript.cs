@@ -2,11 +2,12 @@ using UnityEngine;
 
 public class GameManagerScript : MonoBehaviour
 {
-    public float scale = 1f;
+    float m_CameraScale;
+    public float CameraScale = 1;
 
     void Awake()
     {
-        Camera.main.orthographicSize = (Screen.height / 32f * scale);
+
     }
 
     void Start()
@@ -16,6 +17,10 @@ public class GameManagerScript : MonoBehaviour
 
     void Update()
     {
-
+        if (CameraScale != m_CameraScale)
+        {
+            Camera.main.orthographicSize = (Screen.height / 32f * CameraScale);
+            m_CameraScale = CameraScale;
+        }
     }
 }
