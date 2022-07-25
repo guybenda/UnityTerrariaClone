@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace Assets.Scripts.Game
 {
-    public enum TileId: byte
+    public enum TileId : byte
     {
         Air,
         Dirt,
@@ -59,12 +55,6 @@ namespace Assets.Scripts.Game
         private static TileBase TileByName(string name)
         {
             return internalTiles.Where(x => x.name == name).FirstOrDefault();
-        }
-
-        public static Tile ById(TileId id)
-        {
-            return Tiles[(int)id];
-            //return Tiles.Where(x => x.id == id).FirstOrDefault();
         }
     }
 

@@ -1,8 +1,6 @@
 using Assets.Scripts.Game;
 using Assets.Scripts.Utils;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Tilemaps;

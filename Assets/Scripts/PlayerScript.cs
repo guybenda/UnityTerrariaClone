@@ -1,6 +1,4 @@
 using Assets.Scripts.Game;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public struct PlayerConsts
@@ -12,7 +10,7 @@ public struct PlayerConsts
     public static readonly float AIR_CONTROLL_MULT = 0.75f;
 
     public static readonly float JUMP_SPEED_REGULAR = 17f;
-    public static readonly float JUMP_TIME_REGULAR = 0.267f;
+    public static readonly float JUMP_TIME_REGULAR = 0.28f;
 
     public static readonly float RANGE = 5f;
 
@@ -127,12 +125,10 @@ public class PlayerScript : MonoBehaviour
             }
             else if (Mathf.Abs(currentVelocity) > Mathf.Abs(newVelocity))
             {
-                Debug.Log("MAX SPEED! 1" + currentVelocity);
                 newVelocity += brakeForce;
             }
             else
             {
-                //rb.AddRelativeForce(new(accelForce, 0), ForceMode2D.Impulse);
                 newVelocity += accelForce;
                 if (Mathf.Abs(newVelocity) > PlayerConsts.MAX_SPEED_REGULAR) newVelocity = Mathf.Clamp(newVelocity, -PlayerConsts.MAX_SPEED_REGULAR, PlayerConsts.MAX_SPEED_REGULAR);
             }
@@ -151,19 +147,24 @@ public class PlayerScript : MonoBehaviour
         // Jump
         if (Grounded && jump)
         {
-            //rb.AddRelativeForce(new(0f, PlayerConsts.JUMP_SPEED_REGULAR), ForceMode2D.Impulse);
             var newVelocity = rb.velocity;
             newVelocity.y = PlayerConsts.JUMP_SPEED_REGULAR;
             rb.velocity = newVelocity;
             currentJumpTimer = PlayerConsts.JUMP_TIME_REGULAR;
         }
-        else if ((!Grounded && !Input.GetKey(KeyCode.Space) && currentJumpTimer > 0f) || rb.velocity.y <= 0.1f)
+        else if ((!Grounded && !Input.GetKey(KeyCode.Space) && currentJumpTimer > 0f) || rb.velocity.y <= 0.01f)
         {
             currentJumpTimer = 0f;
+
+            Debug.Log("Stopped jump!!");
         }
         else if (!Grounded && Input.GetKey(KeyCode.Space) && currentJumpTimer > 0f)
         {
             rb.AddRelativeForce(-Physics2D.gravity, ForceMode2D.Force);
+        }
+        else
+        {
+            rb.AddRelativeForce(new(0f, -0.2f), ForceMode2D.Impulse);
         }
 
         currentJumpTimer -= Time.fixedDeltaTime;
@@ -185,7 +186,6 @@ public class PlayerScript : MonoBehaviour
             transform.position.y - (height / 2) - BOTTOM_MARGIN + hitboxOffset.y
         );
 
-        Debug.DrawRay(point2, point1 - point2, Color.red, 0.1f);
         var hit = Physics2D.OverlapArea(point1, point2, LAYER_MASK);
 
         return hit != null;
@@ -250,10 +250,17 @@ public class PlayerScript : MonoBehaviour
 
             var pos = map.Tilemap.WorldToCell(mousePosition);
 
+            if (Vector2.Distance(transform.position, mousePosition) > PlayerConsts.RANGE)
+            {
+
+            }
+            else
+            {
+
+            }
+
+
             map.Map.Tiles[pos.x, pos.y] = TileId.Dirt;
-
-
-            //Debug.DrawRay(new(), pos, Color.red, 0.5f);
         }
     }
 
