@@ -271,6 +271,16 @@ public class PlayerScript : MonoBehaviour
 
     private void MoveClamped(Vector2 direction)
     {
+        RaycastHit2D[] results = new RaycastHit2D[16];
+        int collisions = boxCollider.Cast(direction, results);
 
+        if(collisions == 0)
+        {
+            transform.position += (Vector3)direction;
+        }
+        else
+        {
+
+        }
     }
 }
