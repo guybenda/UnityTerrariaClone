@@ -54,6 +54,7 @@ ScriptedImporter:
     flipbookRows: 0
     flipbookColumns: 0
     ignorePngGamma: 0
+    cookieMode: 0
     filterMode: 1
     aniso: 1
     mipBias: 0
@@ -95,6 +96,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
+    spritePosition: {x: 0, y: 0}
   mosaicSpriteImportData: []
   rigSpriteImportData:
   - name: Layer 1
@@ -105,7 +107,7 @@ ScriptedImporter:
     rect:
       serializedVersion: 2
       x: 4
-      y: 4
+      y: 2347
       width: 256
       height: 256
     spriteID: 2d14a7594fdd5d4449c7130c4418bce5
@@ -116,7 +118,8 @@ ScriptedImporter:
     indices: 
     edges: []
     tessellationDetail: 0
-    uvTransform: {x: 4, y: 4}
+    uvTransform: {x: 4, y: 2347}
+    spritePosition: {x: -269, y: -270}
   - name: Curves 1
     originalName: 
     pivot: {x: 0.5, y: 0.5}
@@ -124,8 +127,8 @@ ScriptedImporter:
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
-      x: 268
-      y: 4
+      x: 807
+      y: 2347
       width: 0
       height: 0
     spriteID: 83a5ab4ce59ea86459ecfa200627c022
@@ -136,7 +139,8 @@ ScriptedImporter:
     indices: 
     edges: []
     tessellationDetail: 0
-    uvTransform: {x: 12, y: -252}
+    uvTransform: {x: 807, y: 2347}
+    spritePosition: {x: 0, y: 256}
   - name: Layer 0
     originalName: 
     pivot: {x: 0.5, y: 0.5}
@@ -145,7 +149,7 @@ ScriptedImporter:
     rect:
       serializedVersion: 2
       x: 4
-      y: 268
+      y: 4
       width: 256
       height: 256
     spriteID: ab6b02b59d7795e4aa3fb4090f06389e
@@ -156,7 +160,8 @@ ScriptedImporter:
     indices: 
     edges: []
     tessellationDetail: 0
-    uvTransform: {x: 4, y: 268}
+    uvTransform: {x: 4, y: 4}
+    spritePosition: {x: -1039, y: -1040}
   characterData:
     bones: []
     parts: []
@@ -196,7 +201,7 @@ ScriptedImporter:
     parentIndex: -1
     spriteID: 2d14a7594fdd5d4449c7130c4418bce5
     layerID: 3
-    mosaicPosition: {x: 4, y: 4}
+    mosaicPosition: {x: 4, y: 2347}
     flatten: 0
     isImported: 1
     isVisible: 1
@@ -206,7 +211,7 @@ ScriptedImporter:
     parentIndex: -1
     spriteID: 83a5ab4ce59ea86459ecfa200627c022
     layerID: 5
-    mosaicPosition: {x: 268, y: 4}
+    mosaicPosition: {x: 807, y: 2347}
     flatten: 0
     isImported: 1
     isVisible: 1
@@ -216,7 +221,7 @@ ScriptedImporter:
     parentIndex: -1
     spriteID: ab6b02b59d7795e4aa3fb4090f06389e
     layerID: 2
-    mosaicPosition: {x: 4, y: 268}
+    mosaicPosition: {x: 4, y: 4}
     flatten: 0
     isImported: 1
     isVisible: 1

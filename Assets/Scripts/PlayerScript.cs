@@ -156,7 +156,7 @@ public class PlayerScript : MonoBehaviour
         {
             currentJumpTimer = 0f;
 
-            Debug.Log("Stopped jump!!");
+            //Debug.Log("Stopped jump!!");
         }
         else if (!Grounded && Input.GetKey(KeyCode.Space) && currentJumpTimer > 0f)
         {
@@ -267,5 +267,10 @@ public class PlayerScript : MonoBehaviour
     void ClampVerticalVelocity()
     {
         rb.velocity = new(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -36.5f, float.MaxValue));
+    }
+
+    private void MoveClamped(Vector2 direction)
+    {
+
     }
 }
