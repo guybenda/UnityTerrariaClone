@@ -3,13 +3,15 @@
     public struct InventoryItem
     {
         public ItemId Item { get; set; }
+
+        private int m_amount;
         public int Amount
         {
-            get { return Amount; }
+            get { return m_amount; }
             set
             {
                 if (value == 0) Item = 0;
-                Amount = value;
+                m_amount = value;
 
             }
         }
